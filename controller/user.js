@@ -182,9 +182,14 @@ exports.get_all_username = function (req, res, next) {
     return models.Users.findAll({
         attributes: ['id', 'username'],
         where: {
-            is_admin: {
-                [op.not]: true
-            }
+            [op.or]: [{
+                is_admin: {
+                    [op.not]: true
+                },
+                id: {
+                    [op.not]: req.user.id
+                }
+            }]
         }
     }).then(users => {
         res.status(200).send(users);

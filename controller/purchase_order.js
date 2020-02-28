@@ -512,11 +512,11 @@ exports.get_submits = function (req, res, next) {
                     ],
                     status_t2: false,
                     [op.or]: [{
-                        t2_user_1: {
+                        t2_user: {
                             [op.not]: req.user.id
                         }
                     }, {
-                        t2_user_1: {
+                        t2_user: {
                             [op.is]: null
                         }
                     }],

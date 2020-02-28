@@ -224,7 +224,8 @@ exports.show_pending_leave = function (req, res, next) {
                 where: {
                     user_id: {
                         [op.not]: req.user.id
-                    }
+                    },
+                    status: false
                 }
             }).then(leave => {
                 resolve(leave);
@@ -377,7 +378,7 @@ exports.add_leave = function (req, res, next) {
         date_from: req.body.leaveObj._date_from,
         date_to: req.body.leaveObj._date_to,
         reason: req.body.leaveObj._reason,
-        emergency: req.body.leaveObj._emergency_contact,
+        emergency_contact: req.body.leaveObj._emergency_contact,
         replace_id: req.body.leaveObj._replace_id
     }).then(leave => {
         res.status(201).send(leave)
