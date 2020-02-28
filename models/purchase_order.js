@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
             type: DataTypes.STRING
         },
+        quotation: { //purchase order reference
+            allowNull: true,
+            type: DataTypes.STRING
+        },
         delv_due: { //delivery due
             allowNull: true,
             type: DataTypes.DATEONLY //change to .DATE once moment.js work
