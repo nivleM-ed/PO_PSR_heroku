@@ -1,0 +1,38 @@
+------CODE FOR INITIAL SETUP------
+------created by nivleM_----------
+
+express --view=pug [name]           //generate express skeleton
+cd [name]                           //get into [name] folder
+npm install                         //to install all dependencies
+npm install -g sequelize-cli    //insall sequelize
+npm install --save sequelize 
+npm install --save pg pg-hstore     //install postgress for sequelize 
+
+--------------------------------------
+create .sequelizerc:
+const path = require('path');
+
+module.exports = {
+    'config':path.resolve('config', 'config.json'),
+    'models-path': path.resolve('', 'models'),
+    'seeders-path': path.resolve('', 'seeders'),
+    'migrations-path': path.resolve('', 'migrations')
+}
+
+cmd => sequelize init
+OR
+npx sequelize-cli init
+-------------------------------------
+
+Once sequelize is done installing, set configurations.
+Create model:
+npx sequelize-cli model:generate --name User --attributes firstName:string,lastName:string,email:string
+
+Once model is done created, migrate to DB:
+npx sequelize-cli db:migrate
+
+--------------------------------------
+
+npm install passport passport-local bcrypt validator express-session connect-flash --save
+
+npm install validator lodash --save
