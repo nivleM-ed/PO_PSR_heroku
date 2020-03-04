@@ -219,8 +219,7 @@ exports.show_pending_leave = function (req, res, next) {
                         as: 'replace_user',
                         attributes: ['username', 'firstname', 'lastname']
                     }
-                ]
-            }, {
+                ],
                 where: {
                     user_id: {
                         [op.not]: req.user.id
@@ -246,7 +245,8 @@ exports.show_pending_leave = function (req, res, next) {
                 where: {
                     user_id: {
                         [op.not]: req.user.id
-                    }
+                    },
+                    status: false
                 }
             }).then(total => {
                 resolve(Math.ceil(total / limit));
