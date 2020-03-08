@@ -442,33 +442,44 @@ exports.get_submits = function (req, res, next) {
                 }
                 ],
                 where: {
-                    delete_req: false,
-                    [op.or]: [{
-                        status_t1_1: false
-                    },
-                    {
-                        status_t1_2: false
-                    }
+                    [op.and]: [
+                        {
+                            [op.or]:
+                                [{
+                                    status_t1_1: false
+                                },
+                                {
+                                    status_t1_2: false
+                                }],
+                        },
+                        {
+                            [op.or]:
+                                [{
+                                    t2_user: {
+                                        [op.not]: req.user.id
+                                    }
+                                }, {
+                                    t2_user: {
+                                        [op.is]: null
+                                    }
+                                }]
+                        },
+                        {
+                            [op.or]:
+                                [{
+                                    t3_user: {
+                                        [op.not]: req.user.id
+                                    }
+                                }, {
+                                    t3_user: {
+                                        [op.is]: null
+                                    }
+                                }]
+                        }
                     ],
+                    status_decline: false,
+                    delete_req: false,
                     status_t2: false,
-                    [op.or]: [{
-                        t2_user: {
-                            [op.not]: req.user.id
-                        }
-                    }, {
-                        t2_user: {
-                            [op.is]: null
-                        }
-                    }],
-                    [op.or]: [{
-                        t3_user: {
-                            [op.not]: req.user.id
-                        }
-                    }, {
-                        t3_user: {
-                            [op.is]: null
-                        }
-                    }],
                     '$branch2.cd$': userBranch,
                     '$department2.cd$': userDep
                 } //t2_user_1 != req.user.id || t2_user_1 = null 
@@ -502,33 +513,44 @@ exports.get_submits = function (req, res, next) {
                 }
                 ],
                 where: {
-                    delete_req: false,
-                    [op.or]: [{
-                        status_t1_1: false
-                    },
-                    {
-                        status_t1_2: false
-                    }
+                    [op.and]: [
+                        {
+                            [op.or]:
+                                [{
+                                    status_t1_1: false
+                                },
+                                {
+                                    status_t1_2: false
+                                }],
+                        },
+                        {
+                            [op.or]:
+                                [{
+                                    t2_user: {
+                                        [op.not]: req.user.id
+                                    }
+                                }, {
+                                    t2_user: {
+                                        [op.is]: null
+                                    }
+                                }]
+                        },
+                        {
+                            [op.or]:
+                                [{
+                                    t3_user: {
+                                        [op.not]: req.user.id
+                                    }
+                                }, {
+                                    t3_user: {
+                                        [op.is]: null
+                                    }
+                                }]
+                        }
                     ],
+                    status_decline: false,
+                    delete_req: false,
                     status_t2: false,
-                    [op.or]: [{
-                        t2_user: {
-                            [op.not]: req.user.id
-                        }
-                    }, {
-                        t2_user: {
-                            [op.is]: null
-                        }
-                    }],
-                    [op.or]: [{
-                        t3_user: {
-                            [op.not]: req.user.id
-                        }
-                    }, {
-                        t3_user: {
-                            [op.is]: null
-                        }
-                    }],
                     '$branch2.cd$': userBranch,
                     '$department2.cd$': userDep
                 } //t2_user_1 != req.user.id || t2_user_1 = null 
@@ -584,7 +606,8 @@ exports.get_pending = function (req, res, next) {
                     delete_req: false,
                     status_t1_1: true,
                     status_t1_2: true,
-                    status_t2: false
+                    status_t2: false,
+                    status_decline: false
                 },
                 limit: limit,
                 offset: (req.params.page - 1) * limit,
@@ -674,6 +697,7 @@ exports.get_pending = function (req, res, next) {
                     delete_req: false,
                     status_t1_1: true,
                     status_t1_2: true,
+                    status_decline: false,
                     status_t2: false
                 }
             }).then(total => {
@@ -1098,7 +1122,35 @@ exports.po_stat_1 = function (req, res, next) {
             id: req.params.po_id
         }
     }).then(exist => {
-        if (exist.status_t1_1) {
+        if (req.user.t2) {
+            if (req.user.id == exist.t2_user) {
+                res.status(200).send({
+                    err: "notAllowed"
+                });
+            } else {
+                return models.purchase_order.update({
+                    status_t1_1: true,
+                    date_pending_1: new Date(),
+                    t2_user: req.user.id
+                }, {
+                    where: {
+                        id: req.params.po_id,
+                        delete_req: {
+                            [op.not]: true
+                        }
+                    }
+                }).then(po => {
+                    res.status(200).send(po);
+                }).catch(err => {
+                    winston.error({
+                        level: 'error',
+                        label: 'po_stat_1_2',
+                        message: err
+                    })
+                    res.status(500).send(err);
+                });
+            }
+        } else if (req.user.t3) {
             if (req.user.id == exist.t3_user) {
                 res.status(200).send({
                     err: "notAllowed"
@@ -1127,34 +1179,67 @@ exports.po_stat_1 = function (req, res, next) {
                 });
             }
         } else {
-            if (req.user.id == exist.t2_user) {
-                res.status(200).send({
-                    err: "notAllowed"
-                });
-            } else {
-                return models.purchase_order.update({
-                    status_t1_1: true,
-                    date_pending_1: new Date(),
-                    t2_user: req.user.id
-                }, {
-                    where: {
-                        id: req.params.po_id,
-                        delete_req: {
-                            [op.not]: true
-                        }
-                    }
-                }).then(po => {
-                    res.status(200).send(po);
-                }).catch(err => {
-                    winston.error({
-                        level: 'error',
-                        label: 'po_stat_1_2',
-                        message: err
-                    })
-                    res.status(500).send(err);
-                });
-            }
+            res.status(200).send({
+                err: "notAllowed"
+            });
         }
+        // if (exist.status_t1_1) {
+        //     if (req.user.id == exist.t3_user) {
+        //         res.status(200).send({
+        //             err: "notAllowed"
+        //         });
+        //     } else {
+        //         return models.purchase_order.update({
+        //             status_t1_2: true,
+        //             date_pending_2: new Date(),
+        //             t3_user: req.user.id
+        //         }, {
+        //             where: {
+        //                 id: req.params.po_id,
+        //                 delete_req: {
+        //                     [op.not]: true
+        //                 }
+        //             }
+        //         }).then(po => {
+        //             res.status(200).send(po);
+        //         }).catch(err => {
+        //             winston.error({
+        //                 level: 'error',
+        //                 label: 'po_stat_1_1',
+        //                 message: err
+        //             })
+        //             res.status(500).send(err);
+        //         });
+        //     }
+        // } else {
+        //     if (req.user.id == exist.t2_user) {
+        //         res.status(200).send({
+        //             err: "notAllowed"
+        //         });
+        //     } else {
+        //         return models.purchase_order.update({
+        //             status_t1_1: true,
+        //             date_pending_1: new Date(),
+        //             t2_user: req.user.id
+        //         }, {
+        //             where: {
+        //                 id: req.params.po_id,
+        //                 delete_req: {
+        //                     [op.not]: true
+        //                 }
+        //             }
+        //         }).then(po => {
+        //             res.status(200).send(po);
+        //         }).catch(err => {
+        //             winston.error({
+        //                 level: 'error',
+        //                 label: 'po_stat_1_2',
+        //                 message: err
+        //             })
+        //             res.status(500).send(err);
+        //         });
+        //     }
+        // }
     }).catch(err => {
         winston.error({
             level: 'error',
@@ -1204,7 +1289,7 @@ exports.po_stat_decline = function (req, res, next) {
         status_decline: true,
         date_decline: new Date(),
         decline_user: req.user.id,
-        decline_reason: req.body.poObj._decline_reason
+        decline_reason: (req.body.poObj._decline_reason == null ? null : req.body.poObj._decline_reason)
     }, {
         where: {
             id: req.params.po_id
@@ -1227,10 +1312,10 @@ exports.search_po = function (req, res, next) {
     let runSP;
     if (req.body.poObj._in_param_1) {
         strSplit = req.body.poObj._in_param_1.split('/');
-        if (strSplit.length > 1) { 
+        if (strSplit.length > 1) {
             in_str = strSplit[3]
-            in_department = strSplit[0].toUpperCase()
-            in_branch = strSplit[1].toUpperCase()
+            in_department = strSplit[1].toUpperCase()
+            in_branch = strSplit[0].toUpperCase()
             strToken = true;
         }
     }
@@ -1241,7 +1326,7 @@ exports.search_po = function (req, res, next) {
                 return db.sequelize
                     .query('SELECT * from F_SEARCH_PO(:a, :b, :c, :d, :e, :f, :g, :h, :i, :j)', {
                         replacements: {
-                            a: in_str, //in_str 
+                            a: parseInt(in_str), //in_str 
                             b: (req.body.poObj._in_param_2 == null ? null : req.body.poObj._in_param_2), //in_company,
                             c: (req.body.poObj._in_param_3 == null ? null : req.body.poObj._in_param_3), //in_date,
                             d: (req.body.poObj._in_param_4 == null ? null : parseInt(req.body.poObj._in_param_4)), //in_month
