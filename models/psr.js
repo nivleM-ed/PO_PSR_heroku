@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         purchase_typ: { //purchase type
             allowNull: true,
-            type: DataTypes.STRING  
+            type: DataTypes.STRING
         },
         purchase_just: { //justification for purchase
             allowNull: true,
@@ -60,9 +60,9 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING
         },
         decline_reason: {
-                allowNull: true,
-                type: DataTypes.STRING
-            },
+            allowNull: true,
+            type: DataTypes.STRING
+        },
         delete_req: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,

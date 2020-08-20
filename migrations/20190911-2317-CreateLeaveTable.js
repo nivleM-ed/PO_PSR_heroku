@@ -56,6 +56,22 @@ module.exports = {
                 allowNull: true,
                 type: Sequelize.STRING
             },
+            group: {
+                allowNull: true,
+                type: Sequelize.STRING
+            },
+            branch: {
+                allowNull: true,
+                type: Sequelize.STRING
+            },
+            designation: {
+                allowNull: true,
+                type: Sequelize.STRING
+            },
+            leave_type: {
+                allowNull: true,
+                type: Sequelize.STRING
+            },
             status: {
                 allowNull: false,
                 type: Sequelize.BOOLEAN,

@@ -43,6 +43,22 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
             type: DataTypes.STRING
         },
+        group: {
+            allowNull: true,
+            type: DataTypes.STRING
+        },
+        branch: {
+            allowNull: true,
+            type: DataTypes.STRING
+        },
+        designation: {
+            allowNull: true,
+            type: DataTypes.STRING
+        },
+        leave_type: {
+            allowNull: true,
+            type: DataTypes.STRING
+        },
         status: { 
             allowNull: false,
             type: DataTypes.BOOLEAN,

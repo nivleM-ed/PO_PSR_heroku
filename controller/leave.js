@@ -379,7 +379,11 @@ exports.add_leave = function (req, res, next) {
         date_to: req.body.leaveObj._date_to,
         reason: req.body.leaveObj._reason,
         emergency_contact: req.body.leaveObj._emergency_contact,
-        replace_id: req.body.leaveObj._replace_id
+        replace_id: req.body.leaveObj._replace_id,
+        group: req.body.leaveObj._group,
+        branch: req.body.leaveObj._branch,
+        designation: req.body.leaveObj._designation,
+        leave_type: req.body.leaveObj._leave_type,
     }).then(leave => {
         res.status(201).send(leave)
     }).catch(err => {
